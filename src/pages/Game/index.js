@@ -64,7 +64,7 @@ const Game = () => {
     });
 
     socketConnection.on('disconnect', () => {
-      resetGame('Connection has been lost...');
+      resetGame('Connection has been lost... Reload the page.');
     });
 
     socketConnection.on('playerMatched', (data) => {
