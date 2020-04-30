@@ -16,8 +16,7 @@ import {
   GameLoading,
 } from './styles';
 
-// const SERVER = 'http://192.168.0.15:3001';
-const SERVER = 'https://tic-tac-toe-serv.herokuapp.com';
+const SERVER = process.env.URL_SERVER || 'http://192.168.0.15:3001';
 
 const Game = () => {
   const [socket, setSocket] = useState();
