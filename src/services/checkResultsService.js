@@ -1,5 +1,4 @@
 const checkResults = (fields) => {
-  console.log(fields);
   let winner;
   let gameOver = false;
   let crossLineWinner;

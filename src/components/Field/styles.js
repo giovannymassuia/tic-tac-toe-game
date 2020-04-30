@@ -38,6 +38,14 @@ export const X = styled.div`
   &::after {
     transform: rotate(-45deg);
   }
+
+  @media (max-width: 40rem) {
+    &::before,
+    &::after {
+      content: '';
+      width: 10px;
+    }
+  }
 `;
 
 export const O = styled.div`
@@ -53,5 +61,9 @@ export const O = styled.div`
 
   &:hover.o__placeholder {
     opacity: 0.2;
+  }
+
+  @media (max-width: 40rem) {
+    border-width: 10px;
   }
 `;

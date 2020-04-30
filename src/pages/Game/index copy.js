@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect } from 'react';
-// import Timer from 'react-compound-timer';
 
 import socketio from 'socket.io-client';
 
@@ -9,84 +8,64 @@ import checkResults from '../../services/checkResultsService';
 
 import {
   Container,
-  GameScore,
   GameContainer,
   GameArea,
   GameOverContainer,
-  GameLoading,
 } from './styles';
 
-// const SERVER = 'http://192.168.0.15:3001';
-const SERVER = 'https://tic-tac-toe-serv.herokuapp.com';
+const SERVER = 'http://localhost:3001';
+// const SERVER = 'https://tic-tac-toe-serv.herokuapp.com';
+
+const socket = socketio.connect(SERVER);
+
+socket.on('connect', () => {
+  localStorage.setItem('@tictactoe:connectionId', socket.id);
+  console.log(`socketId: ${socket.id}`);
+});
 
 const Game = () => {
   const [socket, setSocket] = useState();
 
-  const [loading, setLoading] = useState(true);
-  const [loadingMensage, setLoadingMensage] = useState('Connecting...');
-
+  const [player, setPlayer] = useState('x');
   const [waiting, setWaiting] = useState(true);
-  const [waitingMessage, setWaitingMessage] = useState('');
+  const [fields, setFields] = useState({
+    topLeft: '',
+    topCenter: '',
+    topRight: '',
 
-  const [player, setPlayer] = useState('');
-  const [fields, setFields] = useState({});
+    centerLeft: '',
+    centerCenter: '',
+    centerRight: '',
+
+    bottomLeft: '',
+    bottomCenter: '',
+    bottomRight: '',
+  });
   const [result, setResult] = useState({
     gameOver: false,
     winner: '',
     crossLineWinner: '',
   });
 
-  const resetGame = useCallback((message) => {
-    setLoadingMensage(message);
-    setLoading(true);
-    setWaiting(true);
-    setWaitingMessage('');
-
-    setFields({});
-    setResult({
-      gameOver: false,
-      winner: '',
-      crossLineWinner: '',
-    });
-  }, []);
-
-  const timesUp = useCallback(() => {
-    socket.emit('disconnect');
-  }, [socket]);
-
   useEffect(() => {
-    const socketConnection = socketio.connect(SERVER);
+    socket.on('playerMatched', (data) => {
+      console.log(data);
 
-    socketConnection.on('connect', () => {
-      localStorage.setItem('@tictactoe:connectionId', socketConnection.id);
-      setSocket(socketConnection);
-      setLoadingMensage('Looking for Players...');
-    });
+      const { playerX, playerY } = data;
 
-    socketConnection.on('disconnect', () => {
-      resetGame('Connection has been lost...');
-    });
-
-    socketConnection.on('playerMatched', (data) => {
-      setPlayer(data.player);
-      setLoading(false);
-      setWaitingMessage('');
-
-      if (data.player === 'x') {
+      const id = localStorage.getItem('@tictactoe:connectionId');
+      if (playerX.id === id) {
+        setPlayer(playerX.type);
         setWaiting(false);
       } else {
-        setWaitingMessage('Waiting...');
+        setPlayer(playerY.type);
       }
     });
 
-    socketConnection.on('gameReseted', (data) => {
-      resetGame(`${data.message} Looking for a new player...`);
-    });
-
-    socketConnection.on('updateFields', (data) => {
+    socket.on('updateFields', (data) => {
+      console.log(`updatedData: ${data}`);
       setFields(data);
       setWaiting(false);
-      setWaitingMessage('');
 
       const resultCheck = checkResults(data);
       setResult(resultCheck);
@@ -102,50 +81,28 @@ const Game = () => {
 
         const resultCheck = checkResults(newFields);
         setResult(resultCheck);
+
+        // if (player === 'x') setPlayer('o');
+        // if (player === 'o') setPlayer('x');
       }
 
       setWaiting(true);
-      setWaitingMessage('Waiting...');
-      socket.emit('move', newFields);
+      socket.emit('played', newFields);
+      console.log(socket);
     },
-    [fields, result.gameOver, socket],
+    [fields, player, result.gameOver],
   );
 
   useEffect(() => {
     if (result.gameOver && result.winner) {
-      setWaiting(true);
-      setWaitingMessage(`Player ${result.winner.toUpperCase()} wins!`);
+      // alert(`Player ${result.winner} wins!`);
+      console.log(`Player ${result.winner} wins!`);
     }
   }, [result]);
 
   return (
     <Container>
-      {!loading && (
-        <GameScore>
-          <span>You: {player.toUpperCase()}</span>
-          {waiting && <span>{waitingMessage}</span>}
-          {/* <span>
-            <Timer
-              initialTime={30000}
-              direction="backward"
-              startImmediately={waiting}
-              lastUnit="s"
-              checkpoints={[{ time: 0, callback: () => timesUp() }]}
-            >
-              <Timer.Seconds />.
-              <Timer.Milliseconds />
-            </Timer>
-          </span> */}
-        </GameScore>
-      )}
       <GameContainer>
-        {loading && (
-          <GameLoading>
-            <div>
-              <span>{loadingMensage}</span>
-            </div>
-          </GameLoading>
-        )}
         <GameOverContainer className={result.gameOver && 'showGameOver'}>
           <div className={result.crossLineWinner} />
         </GameOverContainer>

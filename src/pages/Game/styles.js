@@ -7,19 +7,34 @@ export const Container = styled.div`
   height: 100vh;
 
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 `;
 
+export const GameScore = styled.div`
+  width: calc(100vh - 30px);
+  height: 30px;
+  padding: 10px;
+
+  max-width: 100%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
 export const GameContainer = styled.div`
-  width: 100vh;
-  height: 100vh;
+  height: calc(100vh - 30px);
+  width: calc(100vh - 30px);
 
   max-height: 100vw;
   max-width: 100%;
 
   margin: auto;
   position: relative;
+
+  flex: 1;
 `;
 
 export const GameArea = styled.div`
@@ -36,6 +51,10 @@ export const GameArea = styled.div`
     align-items: center;
     padding: 50px;
     border: 5px solid ${colors.primaryColor};
+
+    @media (max-width: 40rem) {
+      padding: 25px;
+    }
   }
 
   .square__top-left {
@@ -242,5 +261,25 @@ export const GameOverContainer = styled.div`
   &.showGameOver div::after {
     opacity: 1;
     visibility: visible;
+  }
+`;
+
+export const GameLoading = styled.div`
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  position: absolute;
+  z-index: 10;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  div {
+    padding: 20px;
+
+    span {
+      font-size: 24px;
+    }
   }
 `;
