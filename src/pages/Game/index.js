@@ -18,6 +18,8 @@ import {
 
 const SERVER = process.env.URL_SERVER || 'http://192.168.0.15:3001';
 
+console.log('process.env.URL_SERVER: ' + process.env.URL_SERVER);
+
 const Game = () => {
   const [socket, setSocket] = useState();
 
